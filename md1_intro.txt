@@ -1,0 +1,256 @@
+MongoDB  :- MongoDB is a popular NoSQL database that uses a document-oriented model to store and manage data.
+
+Relational Database: Table → Row → Column
+MongoDB: Collection → Document → Field
+
+A record in MongoDB ,represented as a JSON like structure called BSON
+
+It is schema-less, flexible, scalable 
+It have less relation and data is stored together.
+Maximum size of documents is 16 MB
+
+---------------------------------------- port: 27017 ----------------------------------------
+show dbs // it show all databases
+
+use latest_db // it will create new database name latest_db
+
+db.students.insertOne({name:"Ram",age:12}) // it will create collections name students and add one documents {name:"Ram",age:12}
+db.students.insertOne({name:"Shyam",age:13})
+db.students.insertMany([{name:"Motu",age:3},{name:"Mohan",age:4},{name:"Manan",age:5},{name:"Ankit",age:6},{name:"Goli",age:7},{name:"Pinku",age:7},{name:"Mathur",age:8},{name:"Ayush",age:9},{name:"Amit",age:10},{name:"Tom",age:11},{name:"Ajay",age:12},{name:"Tappu",age:13},{name:"Anuj",age:13},{name:"Tim",age:13},{name:"Sam",age:2},{name:"Patlu",age:3},{name:"Bilal",age:4},{name:"Tarak",age :5}]);
+
+db.students.find() //it will show all the documents (each document have id-(unique identifier))
+
+-------------------------------------------------------------------------------------------------
+db.students.updateOne({name:"Ram"},{$set:{idCards:{hasPanCard: true,hasAdhaarCard:true}}}) //it update or create new field with the help of $set
+
+db.students.find({name:"Ram"});
+db.students.findOne({name:"Ram"});
+
+db.students.updateMany({},{$set:{hobbies:['Anime','Coocking']}}) // it will update all documents
+
+db.students.find({hobbies:'Anime'});
+db.students.find({'idCards.hasPanCard' : true}); // it is used to find in nested field
+
+--------------------------------------------------------------------------------------------------
+CRUD: Create Read Update Delete
+Create : insertOne(data, options)
+	 insertMany(data, options)
+
+Read :   find (filter, options)
+         findOne(filter, options)
+
+Update : updateOne(filter,data, options)
+	 updateMany(filter,data, options)
+	 replaceOne(filter,data, options)
+
+Delete : deleteOne(filter, options)
+	 deleteMany(filter, options)
+
+-----------------------------------------------------------------------------------------------
+FIND:
+db.students.find(); // it will show all documents (20) or (>20) need to press it to see all element if needed.
+
+db.students.findOne({name:"Tunnu"}); //findOne is used for a single result
+db.students.find({name:"Tunnu"}); //find returns a cursor to all matching results.
+
+db.students.find().count(); // it will count all documents
+db.students.find().forEach((x) => {printjson(x)}) //This command retrieves all documents in the students collection and prints each one in JSON format.
+
+db.students.find().limit(2); //it will print only 2 documents
+
+[Note: all functions is applied to cursor only i.e find().]
+
+db.students.find({age:{$lt:12}}) // it will print all document whose age is less than 12
+db.students.find({age:{$gte:12}}) // it will print all documents whose age is greator than or equall to 12
+db.students.find({age:{$gt:5,$lt:12}}) // it will print documents whose age is greator than 5  and less than 12
+
+db.students.find().toArray();// it will print all element without asking to print it
+
+db.students.find({_id:ObjectId('672a2f3f00e61d2a630d81ac')})
+
+------------------------------------------------------------------------------------------------------
+
+INSERT:
+db.students.insert({name:"shiv" ,age:12}) ; //old
+db.students.insertOne({name:"Ankit",age:13}); //new
+db.students.insertMany([{name:"Vijay",age:23},{name:"Nitin",age:34}]);//insert many document at a time
+
+---------------------------------------------------------------------------------------------------------
+
+UPDATE:
+db.students.updateOne({name:"Vijay"},{$set:{age:32}}); //update only one 
+db.students.updateMany({age:12},{$set:{age:13}}); // update all having age 12
+
+db.students.updateMany({age:13},{$set:{isEligible:false}}); // add field if not exits
+db.students.updateMany({age:{$gte:14}},{$set:{isEligible:true}});
+
+-----------------------------------------------------------------------------------------------------------
+DELETE
+
+db.students.deleteOne({name:"Vijay"}); // it will delete one documents Whose name is Vijay
+db.students.deleteMany({isEligible:false});// it will delete all documents who is not eligible
+db.students.deleteMany({}); // it will delete all documents.
+
+--------------------------------------------------------------------------------------------------------------
+use latest_db;
+show collections;
+db.students.find({},{name:1}); // it will show only name and id(default);
+db.students.find({},{name:1,_id:0}); // it will show only name
+
+----------------------------------------------------------------------------------------------------------------
+Mongo DB is schemaless but we need to maintain schema for our convenience.
+
+-----------------------------------------------------------------------------------------------------------------
+
+DataTypes:-
+
+Text
+Boolean
+Number - Integer(32 bit)
+	 NumberLong(64 bit)
+	 NumberDecimal
+ObjectId
+ISODate
+TimeStamp
+Array
+Embeded Documents
+
+use amazon; //creating database
+ db.companyData.insertOne({ name:"Amazon",isFunded: true,funding:891665985177178718157876917,employees:[{name:"Vipul",age:35},{name:"Amit", age:78}],foundedOn:new Date(),foundedOnTimeStamp:new Timestamp()}) // Adding Data
+ db.companyData.find();// show collection
+ typeof db.companyData.findOne().name; // use to determine type of documents
+---------------------------------------------------------------------------------------------------------------------
+
+ use temp;
+ db.t1.insertOne({name:"temp2",type:"temp2"});
+ db.t2.insertOne({name:"temp2",type:"temp2"});
+ db.dropDatabase() // it will delete all collections inside database
+ db.t1.drop(); // it will drop only t1(collections)
+
+---------------------------------------------------------------------------------------------------------------------------------
+ use product;
+ db.books.insertMany([{_id:"A",name:"A",price:100},{_id:"B",name:"B",price:200}])
+ db.books.insertMany([{_id:"C",name:"C",price:300},{_id:"A",name:"D",price:400},{_id:"E",name:"E",price:500}]); // it will show error because id A is already available and id should unique , bydefault list is ordered that's why id E also not insereted although it's id is unique
+ db.books.insertMany([{_id:"F",name:"F",price:300},{_id:"A",name:"D",price:400},{_id:"G",name:"G",price:500}],{ordered:false});// here except name="D" all are inserted due to ordered:false;
+
+---------------------------------------------------------------------------------------------------------------
+use books;
+db.createCollection("nonFiction");
+
+Validation is use to set the dataType in fields.
+
+db.createCollection("nonFiction",{
+    validator:{
+        $jsonSchema:{
+            required:['name','price'],
+            properties:{
+                name:{
+                    bsonType:'string',
+                    description: 'must be a string and reuired'
+                },
+                price:{
+                    bsonType:'number',
+                    description:'must be a number'
+                }
+            }
+        }
+    },
+    validationAction:'error'
+}) // in this we create a collection name 'nonFiction' in this name and price field is mandatory and name must be string and price must be a number
+
+db.nonFiction.insert({name:"Way of Men"}) // it will give error because price is mandatory
+
+db.nonFiction.insert({name:"Way of Men",price:"300"}) // it will again give an error because price must be number
+
+db.nonFiction.insert({name:"Way of Men",price:300}) //correct
+db.nonFiction.insert({name:"48 laws of power" ,price:400.89,autor:"Robert"}) // other field can be added
+
+//change the validation
+db.runCommand({
+    collMod: 'nonFiction',
+    validator:{
+        $jsonSchema:{
+            required:['name','price','author'],
+            properties:{
+                name:{
+                    bsonType:'string',
+                    description: 'must be a string and reuired'
+                },
+                price:{
+                    bsonType:'number',
+                    description:'must be a number'
+                },
+                author:{
+                    bsonType:'array',
+                    description:"must be an array",
+                    items:{
+                        bsonType:'object',
+                        required:['name','email'],
+                        properties:{
+                            name:{
+                                bsonType:'string'
+                            },
+                            email:{
+                                bsonType:'string'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    validationAction:'error'
+})
+// one more required (author) thing is added and author must be an object and it contain name and email both name and email should be string
+
+db.nonFiction.insertOne({name:"can't hurt me",price:899,author:[{name:"Raju",email:"raju01@xyz.com"}]}) //min thing after change
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+WriteConcern : 
+
+use products;
+db.books.insertOne({name : "A",price:1});
+db.books.insertOne({name : "B",price:2},{writeConcern:{w:0}}); //w:0 means no acknowledgement require
+db.books.insertOne({name : "C",price:3},{writeConcern:{w:0,j:false}}); //default Operation and means no journaling acknowledgement
+db.books.insertOne({name : "C",price:3},{writeConcern:{w:0,j:true}}); // j:true -> means it will help in continue operation after restart of server
+db.books.insertOne({name : "C",price:3},{writeConcern:{w:0,j:true,wtimeout:100}}); //wtimeout:100 -> means it will wait till 100ms to write
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Atomicity:- atomicity ensures that write operations on a single document are atomic, meaning they either complete fully or have no effect at all, preventing partial updates. 
+	    Atomicity is at document level.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+mongoimport is use to import json file
+
+mongoimport "C:\Users\rohit\OneDrive\Desktop\Mongodb\students.json" -d college -c students --jsonArray --drop
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+use college;
+$eq :- db.students.find({age:{$eq:25}}); //$eq means equal to
+$ne :- db.students.find({age:{$ne:25}}); //$ne means not equal to
+$gt :- db.students.find({age:{$gt:12}}); //$gt means greator than
+$lt :- db.students.find({age:{$lt:12}}); //$lt means less than
+$gte :- db.students.find({age:{$gte:12}}); //$gte means greator than and equal
+$lte :- db.students.find({age:{$lte:12}}); //$lte means less than and equal
+$in :- db.students.find({age:{$in:[11,12,15]}}) //$in means find in given array only
+
+db.students.find({Hobbies: "Walk"}) // find can use to find in list also
+db.students.find({'identity.hasAdhaarCard':true}) // find in nested file
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+$or :- db.students.find({$or:[{age:{$gt:12}},{age:{$lt:25}}]}); // it is use to find students whose age is greator than 12 or less than 25
+$nor :- db.students.find({$nor:[{age:{$gt:20}},{age:{$lt:10}}]});// it is use to find students whose age is nethier greator than 12 nor less than 25
+$and :- db.students.find({$and:[{age:10},{Hobbies:"Walk"}]}); // $and is use to find age =10 and hobbies =walk
+$not :- db.students.find({age:{$not:{$eq:10}}}); //it will all students whose give age is not equal to 10
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+$exists :- db.students.find({hasMacBook:{$exists:true}}) // it use to find fields
+	   db.students.find({hasMacBook:{$exists:true,$eq:true}}) // it will find hasMacBook and check its value =true
+db.students.find({hasMacBook:{$exists:true,$type:"bool"}}) // it will find field hasMacBook have datatype boolean
+
+
+
+
+
+
